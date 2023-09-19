@@ -502,9 +502,11 @@ class KogitoJobTemplate {
                     buildOriginPRMerge(true)
                 }
             }
-            properties("""BRANCH=${Utils.getGitMainBranch(script)}
-GENERATION_BRANCH=${Utils.getGenerationBranch(script)}
-""")
+            properties {
+                envVars { 
+                    properties("BRANCH=${Utils.getGitMainBranch(script)}\nGENERATION_BRANCH=${Utils.getGenerationBranch(script)}")
+                }
+            }
             orphanedItemStrategy {
                 discardOldItems {
                     daysToKeep(10)
