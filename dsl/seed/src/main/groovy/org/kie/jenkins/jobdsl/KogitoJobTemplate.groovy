@@ -503,10 +503,10 @@ class KogitoJobTemplate {
                 }
             }
             properties {
-                envVars { """
-BRANCH=${Utils.getGitMainBranch(script)}
+                envVars { 
+                    properties("""BRANCH=${Utils.getGitMainBranch(script)}
 GENERATION_BRANCH=${Utils.getGenerationBranch(script)}
-"""
+""")
                 }
             }
             orphanedItemStrategy {
