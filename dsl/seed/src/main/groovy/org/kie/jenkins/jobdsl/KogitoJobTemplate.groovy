@@ -517,9 +517,8 @@ class KogitoJobTemplate {
         script.folder('branch_jobs')
         return script.multibranchPipelineJob("branch_jobs/${jobName}")?.with {
             triggers {
-                periodicFolderTrigger {
-                    // The maximum amount of time since the last indexing that is allowed to elapse before an indexing is triggered.
-                    interval('5m')
+                issueCommentTrigger {
+                    commentPattern('Jenkins test this')
                 }
             }
             factory {
