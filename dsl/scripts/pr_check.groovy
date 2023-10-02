@@ -33,7 +33,7 @@ void launchInDocker(String builderImage) {
             if (currentBuild.currentResult != 'SUCCESS') {
                 // TODO ci token as env ?
                 postComment(
-                    "Testing comment *Bold*"
+                    "Testing comment *Bold*",
                     //util.getMarkdownTestSummary('PR', getReproducer(true), "${BUILD_URL}", 'GITHUB'),
                     'jstastny-cz-ci-token'
                 )
