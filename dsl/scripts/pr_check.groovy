@@ -27,6 +27,7 @@ void launchInDocker(String builderImage) {
         sh 'ls -last /var/run/docker.sock'
         try {
             echo "Skipping stages"
+            error "something went wrong"
             //launchStages()
         } finally {
             echo "Got build result ${currentBuild.currentResult}"
