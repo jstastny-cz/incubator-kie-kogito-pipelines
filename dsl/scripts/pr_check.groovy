@@ -152,7 +152,7 @@ void postComment(String commentText, String githubTokenCredsId = "kie-ci1-token"
     writeJSON(json: jsonComment, file: filename)
     sh "cat ${filename}"
     withCredentials([string(credentialsId: githubTokenCredsId, variable: 'GITHUB_TOKEN')]) {
-        sh "curl -s -H \"Authorization: token ${GITHUB_TOKEN}\" -X POST -d '@${filename}' \"https://api.github.com/repos/${BUILDCHAIN_PROJECT}/issues/${CHANGE_ID}/comments\""
+        sh "curl -s -H \"Authorization: token ${GITHUB_TOKEN}\" -X POST -d '@${filename}' \"https://api.github.com/repos/jstastny-cz/drools/issues/${CHANGE_ID}/comments\""
     }
     sh "rm ${filename}"
 }
