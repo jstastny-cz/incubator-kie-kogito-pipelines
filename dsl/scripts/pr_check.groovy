@@ -31,14 +31,14 @@ void launchInDocker(String builderImage) {
             //launchStages()
         } finally {
             echo "Got build result ${currentBuild.currentResult}"
-            if (currentBuild.currentResult != 'SUCCESS') {
+            // if (currentBuild.currentResult != 'SUCCESS') {
                 // TODO ci token as env ?
                 postComment(
                     "Testing comment *Bold*",
                     //util.getMarkdownTestSummary('PR', getReproducer(true), "${BUILD_URL}", 'GITHUB'),
                     'jstastny-cz-ci-token'
                 )
-            }
+            // }
         }
     }
 }
