@@ -35,7 +35,7 @@ void launchInDocker(String builderImage) {
                 postComment(
                     "Testing comment *Bold*"
                     //util.getMarkdownTestSummary('PR', getReproducer(true), "${BUILD_URL}", 'GITHUB'),
-                    'kie-ci3-token'
+                    'jstastny-cz-ci-token'
                 )
             }
         }
