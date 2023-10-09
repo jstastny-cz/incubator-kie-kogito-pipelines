@@ -38,7 +38,8 @@ environments:
     ids:
     - ecosystem
 disable:
-  deploy: true 
+  deploy: true
+  triggers: true
 repositories:
 - name: incubator-kie-kogito-pipelines
   job_display_name: kogito-pipelines
