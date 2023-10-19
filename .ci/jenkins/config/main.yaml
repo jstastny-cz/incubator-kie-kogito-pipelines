@@ -25,11 +25,11 @@ git:
 seed:
   config_file:
     git:
-      repository: incubator-kie-kogito-pipelines
+      repository: kogito-pipelines
       author:
-        name: apache
+        name: jstastny-cz
         credentials_id: ASF_Cloudbees_Jenkins_ci-builds
-      branch: main
+      branch: kie-issues#632
     path: .ci/jenkins/config/branch.yaml
   jenkinsfile: dsl/seed/jenkinsfiles/Jenkinsfile.seed.branch
 jenkins:

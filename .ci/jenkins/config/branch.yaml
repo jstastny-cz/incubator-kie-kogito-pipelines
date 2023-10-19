@@ -38,7 +38,8 @@ environments:
     ids:
     - ecosystem
 disable:
-  deploy: true 
+  deploy: true
+  pr_checks: true
 repositories:
 - name: incubator-kie-kogito-pipelines
   job_display_name: kogito-pipelines
@@ -63,7 +64,7 @@ repositories:
   branch: main-kogito
 git:
   author:
-    name: apache
+    name: jstastny-cz
     # Taken from https://ci-builds.apache.org/credentials/
     # Need to be verified
     credentials_id: 399061d0-5ab5-4142-a186-a52081fef742

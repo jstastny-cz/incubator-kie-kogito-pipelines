@@ -41,33 +41,11 @@ class KogitoJobTemplate {
     *
     */
     static def createPipelineJob(def script, Map jobParams = [:]) {
-        String jobFolderName = ''
         def jobFolder = jobParams.job.folder
-        if (jobFolder) {
-            if (!jobFolder instanceof JenkinsFolder) {
-                throw new RuntimeException('Folder is not of type org.kie.jenkins.jobdsl.model.JenkinsFolder')
-            }
-
-            // Expect org.kie.jenkins.jobdsl.model.Folder structure
-            jobFolderName = jobFolder.getName()
-
-            if (!EnvUtils.isEnvironmentDefined(script, jobFolder.getEnvironmentName())) {
-                String output = "Cannot create job name ${jobParams.job.name} in jobFolder ${jobFolderName} as environment ${jobFolder.getEnvironmentName()} is NOT configured"
-                if (Utils.isGenerationFailOnMissingEnvironment(script)) {
-                    throw new RuntimeException(output)
-                } else if (Utils.isGenerationIgnoreOnMissingEnvironment(script)) {
-                    // Do no create the job if the folder is not active
-                    PrintUtils.warn(script, output)
-                    return
-                }
-            } else if (!jobFolder.isActive(script)) {
-                // Do no create the job if the folder is not active
-                PrintUtils.warn(script, "Cannot create job name ${jobParams.job.name} in jobFolder ${jobFolderName} as folder is NOT active")
-                return
-            }
-
-            script.folder(jobFolderName)
+        if (!handleFolder(script, jobParams)){
+            return
         }
+        String jobFolderName = jobFolder.getName()
 
         // Setup job full environment
         Map fullEnv = [:]
@@ -154,6 +132,34 @@ class KogitoJobTemplate {
             }
 }
 }
+    static def handleFolder(def script, Map jobParams = [:]) {
+        def jobFolder = jobParams.job.folder
+        if (jobFolder) {
+            if (!jobFolder instanceof JenkinsFolder) {
+                throw new RuntimeException('Folder is not of type org.kie.jenkins.jobdsl.model.JenkinsFolder')
+            }
+
+            // Expect org.kie.jenkins.jobdsl.model.Folder structure
+            def jobFolderName = jobFolder.getName()
+
+            if (!EnvUtils.isEnvironmentDefined(script, jobFolder.getEnvironmentName())) {
+                String output = "Cannot create job name ${jobParams.job.name} in jobFolder ${jobFolderName} as environment ${jobFolder.getEnvironmentName()} is NOT configured"
+                if (Utils.isGenerationFailOnMissingEnvironment(script)) {
+                    throw new RuntimeException(output)
+                } else if (Utils.isGenerationIgnoreOnMissingEnvironment(script)) {
+                    // Do no create the job if the folder is not active
+                    PrintUtils.warn(script, output)
+                    return
+                }
+            } else if (!jobFolder.isActive(script)) {
+                // Do no create the job if the folder is not active
+                PrintUtils.warn(script, "Cannot create job name ${jobParams.job.name} in jobFolder ${jobFolderName} as folder is NOT active")
+                return
+            }
+
+            script.folder(jobFolderName)
+        }
+    }
 
     /**
     * Create a PR job
@@ -466,29 +472,35 @@ class KogitoJobTemplate {
         return "(.*${RegexUtils.getRegexFirstLetterCase('jenkins')},?.*(rerun|run) ${idStr}${testType}.*)"
     }
 
-    static def createPullRequestMultibranchPipelineJob(def script, String jenkinsFilePath = '.ci/jenkins/Jenkinsfile') {
-        String jobName = "${Utils.getJobDisplayName(script)}-pr"
-        PrintUtils.debug(script, "Create pull request multibranch job ${jobName}")
-        script.folder('pullrequest_jobs')
-        return script.multibranchPipelineJob("pullrequest_jobs/${Utils.getJobDisplayName(script)}-pr")?.with {
+    static def createPullRequestMultibranchPipelineJob(def script, Map jobParams = [:]) {
+        def jobFolder = jobParams.job.folder
+        if (!handleFolder(script, jobParams)){
+            return
+        }
+        String jobFolderName = jobFolder.getName()
+        String jobFullName = "${jobFolderName ? "${jobFolderName}/" : ''}${jobParams.job.name}"
+        return script.multibranchPipelineJob(jobFullName)?.with {
             triggers {
                 periodicFolderTrigger {
                     // The maximum amount of time since the last indexing that is allowed to elapse before an indexing is triggered.
                     interval('5m')
                 }
             }
+            configure {
+                it / disabled << Utils.isPrChecksDisabled(script)
+            }
             factory {
                 workflowBranchProjectFactory {
-                    scriptPath(jenkinsFilePath)
+                    scriptPath(jobParams.jenkinsfile)
                 }
             }
             branchSources {
                 github {
-                    id(Utils.getRepoName(script)) // IMPORTANT: use a constant and unique identifier
+                    id(jobFullName) // IMPORTANT: use a constant and unique identifier
                     repoOwner(Utils.getGitAuthor(script))
                     repository(Utils.getRepoName(script))
-                    checkoutCredentialsId(Utils.getGitAuthorCredsId(script))
-                    scanCredentialsId(Utils.getGitAuthorCredsId(script))
+                    checkoutCredentialsId(Utils.getGitAuthorCredsId(script)) // this one needs to be the token from apache
+                    scanCredentialsId(Utils.getGitAuthorCredsId(script)) // this one needs to be the token from apache
                     // Build fork PRs (unmerged head).
                     buildForkPRHead(true)
                     // Build fork PRs (merged with base branch).
@@ -506,6 +518,23 @@ class KogitoJobTemplate {
             orphanedItemStrategy {
                 discardOldItems {
                     daysToKeep(10)
+                }
+            }
+            properties {
+                envVars {
+                    properties("""
+                    BUILDCHAIN_PROJECT=apache/${repository}
+                    BUILDCHAIN_TYPE=full_downstream
+                    BUILDCHAIN_CONFIG_REPO=${Utils.getBuildChainConfigRepo(script) ?: Utils.getSeedRepo(script)}
+                    BUILDCHAIN_CONFIG_AUTHOR=${Utils.getBuildChainConfigAuthor(script) ?: Utils.getSeedAuthor(script)}
+                    BUILDCHAIN_CONFIG_BRANCH=${Utils.getBuildChainConfigBranch(script) ?: Utils.getSeedBranch(script)}
+                    BUILDCHAIN_CONFIG_FILE_PATH=${Utils.getBuildChainConfigFilePath(script)}
+                    GIT_CREDS_ID=${Utils.getBuildChainConfigCredentialsId(script)}
+                    GIT_TOKEN_CREDS_ID=${Utils.getBuildChainConfigTokenCredentialsId(script)}
+                    MAVEN_SETTINGS_CONFIG_FILE_ID=kie-pr-settings
+                    AGENT_DOCKER_BUILDER_IMAGE=${Utils.getJenkinsAgentDockerImage(script, 'builder')}
+                    AGENT_DOCKER_BUILDER_ARGS=${Utils.getJenkinsAgentDockerArgs(script, 'builder')}
+                    """)
                 }
             }
         }
@@ -532,8 +561,8 @@ class KogitoJobTemplate {
                     id(Utils.getRepoName(script)) // IMPORTANT: use a constant and unique identifier
                     repoOwner(Utils.getGitAuthor(script))
                     repository(Utils.getRepoName(script))
-                    checkoutCredentialsId(Utils.getGitAuthorCredsId(script))
-                    scanCredentialsId(Utils.getGitAuthorCredsId(script))
+                    checkoutCredentialsId(Utils.getGitAuthorCredsId(script)) // this one needs to be the token from apache
+                    scanCredentialsId(Utils.getGitAuthorCredsId(script)) // this one needs to be the token from apache
                     // Build fork PRs (unmerged head).
                     buildForkPRHead(false)
                     // Build fork PRs (merged with base branch).

@@ -1,16 +1,7 @@
-// TODO Docker image and args could be passed as env or anything ?
-dockerGroups = [ 
-    'docker',
-    'input',
-    'render',
-]
-dockerArgs = [
-    '-v /var/run/docker.sock:/var/run/docker.sock',
-    '--network host',
-] + dockerGroups.collect { group -> "--group-add ${group}" }
+dockerArgs = env.AGENT_DOCKER_BUILDER_ARGS
 
 void launch() {
-    String builderImage = 'quay.io/kiegroup/kogito-ci-build:main-latest'
+    String builderImage = env.AGENT_DOCKER_BUILDER_IMAGE
     sh "docker rmi -f ${builderImage} || true" // Remove before launching
 
     try {
@@ -21,7 +12,7 @@ void launch() {
 }
 
 void launchInDocker(String builderImage) {
-    docker.image(builderImage).inside(dockerArgs.join(' ')) {
+    docker.image(builderImage).inside(dockerArgs) {
         // Debug. To be removed in the future
         sh "printenv"
         sh 'ls -last /var/run/docker.sock'
@@ -33,7 +24,7 @@ void launchInDocker(String builderImage) {
                 // TODO ci token as env ?
                 postComment(
                     util.getMarkdownTestSummary('PR', getReproducer(true), "${BUILD_URL}", 'GITHUB'),
-                    'kie-ci3-token'
+                    "${env.GIT_TOKEN_CREDS_ID}"
                 )
             }
         }
@@ -60,8 +51,8 @@ void launchStages() {
         sh 'build-chain || true'
     }
     stage('Build projects') {
-        configFileProvider([configFile(fileId: 'kie-pr-settings', variable: 'MAVEN_SETTINGS_FILE')]) { // TODO as env ?
-            withCredentials([string(credentialsId: 'kie-ci3-token', variable: 'GITHUB_TOKEN')]) { // TODO as env ?
+        configFileProvider([configFile(fileId: MAVEN_SETTINGS_CONFIG_FILE_ID, variable: 'MAVEN_SETTINGS_FILE')]) {
+            withCredentials([string(credentialsId: GIT_TOKEN_CREDS_ID, variable: 'GITHUB_TOKEN')]) {
                 env.BUILD_MVN_OPTS = "${env.BUILD_MVN_OPTS ?: ''} -s ${MAVEN_SETTINGS_FILE} -Dmaven.wagon.http.ssl.insecure=true -Dmaven.test.failure.ignore=true"
                 echo "BUILD_MVN_OPTS = ${BUILD_MVN_OPTS}"
 
@@ -94,17 +85,19 @@ void launchStages() {
 String getBuildChainCommandline() {
     // Those can be overriden in Jenkinsfiles
     String buildChainProject = env.BUILDCHAIN_PROJECT ?: CHANGE_REPO
+    String buildChainType = env.BUILDCHAIN_TYPE ?: 'full_downstream'
     String buildChainConfigRepo = env.BUILDCHAIN_CONFIG_REPO ?: 'incubator-kie-kogito-pipelines'
     String buildChainConfigBranch = env.BUILDCHAIN_CONFIG_BRANCH ?: '\${BRANCH:main}'
     String buildChainConfigGitAuthor = env.BUILDCHAIN_CONFIG_AUTHOR ?: '\${AUTHOR:apache}'
     String buildChainConfigDefinitionFilePath = env.BUILDCHAIN_CONFIG_FILE_PATH ?: '.ci/buildchain-config-pr-cdb.yaml'
+
 
     List buildChainAdditionalArguments = [
         "-p ${buildChainProject}",
         "-u ${CHANGE_URL}", // Provided by source branch plugin
     ]
     // TODO remove debug option
-    return "build-chain build full_downstream ${env.GITHUB_TOKEN ? "--token ${GITHUB_TOKEN} " : ''} -f 'https://raw.githubusercontent.com/${buildChainConfigGitAuthor}/${buildChainConfigRepo}/${buildChainConfigBranch}/${buildChainConfigDefinitionFilePath}' -o 'bc' ${buildChainAdditionalArguments.join(' ')} --skipParallelCheckout"
+    return "build-chain build ${buildChainType} ${env.GITHUB_TOKEN ? "--token ${GITHUB_TOKEN} " : ''} -f 'https://raw.githubusercontent.com/${buildChainConfigGitAuthor}/${buildChainConfigRepo}/${buildChainConfigBranch}/${buildChainConfigDefinitionFilePath}' -o 'bc' ${buildChainAdditionalArguments.join(' ')} --skipParallelCheckout"
 }
 
 boolean isEnableSonarCloudAnalysis() {
@@ -139,7 +132,7 @@ ${reproducer}
 /**
 * This method add a comment to current PR (for Github Branch Source plugin)
 */
-void postComment(String commentText, String githubTokenCredsId = "kie-ci1-token") {
+void postComment(String commentText, String githubTokenCredsId = "kie-ci3-token") {
     if (!CHANGE_ID) {
         error "Pull Request Id variable (CHANGE_ID) is not set. Are you sure you are running with Github Branch Source plugin ?"
     }
@@ -150,7 +143,7 @@ void postComment(String commentText, String githubTokenCredsId = "kie-ci1-token"
     writeJSON(json: jsonComment, file: filename)
     sh "cat ${filename}"
     withCredentials([string(credentialsId: githubTokenCredsId, variable: 'GITHUB_TOKEN')]) {
-        sh "curl -s -H \"Authorization: token ${GITHUB_TOKEN}\" -X POST -d '@${filename}' \"https://api.github.com/repos/${BUILDCHAIN_PROJECT}/issues/${CHANGE_ID}/comments\""
+        sh "curl -s -H \"Authorization: token ${GITHUB_TOKEN}\" -X POST -d '@${filename}' \"https://api.github.com/repos/${CHANGE_REPO}/issues/${CHANGE_ID}/comments\""
     }
     sh "rm ${filename}"
 }

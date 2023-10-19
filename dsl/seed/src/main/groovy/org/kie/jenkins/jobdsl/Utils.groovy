@@ -215,6 +215,10 @@ class Utils {
         return getBindingValue(script, 'BUILDCHAIN_CONFIG_GIT_TOKEN_CREDENTIALS_ID')
     }
 
+    static String getBuildChainConfigCredentialsId(def script) {
+        return getBindingValue(script, 'BUILDCHAIN_CONFIG_GIT_CREDENTIALS_ID')
+    }
+
     static String getMavenArtifactsUploadRepositoryUrl(def script) {
         return getBindingValue(script, 'MAVEN_ARTIFACTS_UPLOAD_REPOSITORY_URL')
     }
@@ -281,6 +285,10 @@ class Utils {
 
     static boolean isDeployDisabled(def script) {
         return getBindingValue(script, 'DISABLE_DEPLOY').toBoolean() || isTestEnvironment(script)
+    }
+
+    static boolean isPrChecksDisabled(def script) {
+        return getBindingValue(script, 'DISABLE_PR_CHECKS').toBoolean()
     }
 
 }

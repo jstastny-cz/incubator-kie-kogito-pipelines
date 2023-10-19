@@ -1,3 +1,6 @@
+plugins {
+        id "de.undercouch.download" version "5.5.0"
+}
 apply plugin: 'groovy'
 
 sourceSets {
@@ -10,7 +13,7 @@ sourceSets {
         runtimeClasspath += sourceSets.main.output
     }
 }
-
+def testDependenciesFolder = new File(sourceSets.test.output.resourcesDir, 'test-dependencies')
 repositories {
     mavenCentral()
     maven {
@@ -57,6 +60,7 @@ dependencies {
     testPlugins "org.jenkins-ci.plugins.workflow:workflow-aggregator:${version_jenkins_plugins_workflow_aggregator}"
     testPlugins "org.jenkins-ci.plugins.workflow:workflow-step-api:${version_jenkins_plugins_workflow_step_api}"
     testPlugins "org.jenkins-ci.plugins:cloudbees-folder:${version_jenkins_plugins_cloudbees_folder}"
+    compile fileTree(dir: testDependenciesFolder, include: ['cloudbees-folders-plus.hpi'])
     testPlugins "com.coravy.hudson.plugins.github:github:${version_jenkins_plugins_github}"
     testPlugins "com.sonyericsson.hudson.plugins.rebuild:rebuild:${version_jenkins_plugins_rebuild}" 
     testPlugins "org.jenkins-ci.main:maven-plugin:${version_jenkins_plugins_maven_plugin}"
@@ -105,7 +109,7 @@ dependencies {
 
 task resolveTestPlugins(type: Copy) {
     from configurations.testPlugins
-    into new File(sourceSets.test.output.resourcesDir, 'test-dependencies')
+    into testDependenciesFolder
     include '*.hpi'
     include '*.jpi'
     def mapping = [:]
@@ -119,9 +123,19 @@ task resolveTestPlugins(type: Copy) {
 
     doLast {
         List<String> baseNames = source*.name.collect { mapping[it] }.collect { it[0..it.lastIndexOf('.') - 1] }
+        baseNames.add('cloudbees-folders-plus')
         new File(destinationDir, 'index').setText(baseNames.join('\n'), 'UTF-8')
     }
 }
+
+task downloadFile(type: Download) {
+    dependsOn tasks.resolveTestPlugins
+    src 'https://jenkins-updates.cloudbees.com/download/plugins/cloudbees-folders-plus/3.9/cloudbees-folders-plus.hpi'
+    dest new File(testDependenciesFolder, 'cloudbees-folders-plus.hpi')
+    overwrite true
+}
+tasks.compileTestGroovy.dependsOn("downloadFile")
+tasks.compileGroovy.dependsOn("downloadFile")
 
 test {
     dependsOn tasks.resolveTestPlugins
