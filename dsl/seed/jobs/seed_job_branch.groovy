@@ -5,16 +5,18 @@ import org.kie.jenkins.jobdsl.KogitoConstants
 import org.kie.jenkins.jobdsl.utils.SeedJobUtils
 import org.kie.jenkins.jobdsl.Utils
 
+def GENERATION_BRANCH_SANITIZED=getSanitizedBranchName(env.GENERATION_BRANCH)
+
 // Create all folders
-folder("${GENERATION_BRANCH}")
+folder("${GENERATION_BRANCH_SANITIZED}")
 if (Utils.isOldFolderStructure(this)) {
     // For old branches
-    FolderUtils.getAllNeededFolders().each { folder("${GENERATION_BRANCH}/${it}") }
+    FolderUtils.getAllNeededFolders().each { folder("${GENERATION_BRANCH_SANITIZED}/${it}") }
 }
 
 SeedJobUtils.createSeedJobTrigger(
     this,
-    "${GENERATION_BRANCH}/z-seed-trigger-job",
+    "${GENERATION_BRANCH_SANITIZED}/z-seed-trigger-job",
     Utils.getSeedRepo(this),
     Utils.getSeedAuthor(this),
     Utils.getSeedAuthorCredsId(this),
@@ -32,7 +34,7 @@ SeedJobUtils.createSeedJobTrigger(
 
 SeedJobUtils.createSeedJobTrigger(
     this,
-    "${GENERATION_BRANCH}/z-seed-config-trigger-job",
+    "${GENERATION_BRANCH_SANITIZED}/z-seed-config-trigger-job",
     "${SEED_CONFIG_FILE_GIT_REPOSITORY}",
     "${SEED_CONFIG_FILE_GIT_AUTHOR_NAME}",
     "${SEED_CONFIG_FILE_GIT_AUTHOR_CREDS_ID}",
@@ -44,7 +46,7 @@ SeedJobUtils.createSeedJobTrigger(
 )
 
 // Configuration of the seed and generated jobs is done via `dsl/seed/config.yaml`
-pipelineJob("${GENERATION_BRANCH}/${JOB_NAME}") {
+pipelineJob("${GENERATION_BRANCH_SANITIZED}/${JOB_NAME}") {
     description("This job creates all needed Jenkins jobs on branch ${GENERATION_BRANCH}. DO NOT USE FOR TESTING !!!! See https://github.com/apache/incubator-kie-kogito-pipelines/blob/main/docs/jenkins.md#test-specific-jobs")
 
     logRotator {
@@ -104,8 +106,8 @@ pipelineJob("${GENERATION_BRANCH}/${JOB_NAME}") {
 }
 
 // Toggle triggers job
-folder("${GENERATION_BRANCH}/tools")
-pipelineJob("${GENERATION_BRANCH}/tools/toggle-dsl-triggers") {
+folder("${GENERATION_BRANCH_SANITIZED}/tools")
+pipelineJob("${GENERATION_BRANCH_SANITIZED}/tools/toggle-dsl-triggers") {
     description('Toggle DSL triggers')
 
     logRotator {
@@ -151,4 +153,8 @@ pipelineJob("${GENERATION_BRANCH}/tools/toggle-dsl-triggers") {
     properties {
         githubProjectUrl("https://github.com/${Utils.getSeedAuthor(this)}/${Utils.getSeedRepo(this)}/")
     }
+}
+
+def getSanitizedBranchName(String branchName) {
+    return branchName.replaceAll("#","_")
 }
