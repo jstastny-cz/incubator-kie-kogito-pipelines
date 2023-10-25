@@ -5,7 +5,7 @@ import org.kie.jenkins.jobdsl.KogitoConstants
 import org.kie.jenkins.jobdsl.utils.SeedJobUtils
 import org.kie.jenkins.jobdsl.Utils
 
-def GENERATION_BRANCH_SANITIZED=getSanitizedBranchName(env.GENERATION_BRANCH)
+def GENERATION_BRANCH_SANITIZED=getSanitizedBranchName(GENERATION_BRANCH)
 
 // Create all folders
 folder("${GENERATION_BRANCH_SANITIZED}")
