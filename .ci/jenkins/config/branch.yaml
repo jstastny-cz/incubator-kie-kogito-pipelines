@@ -44,7 +44,6 @@ repositories:
   job_display_name: kogito-apps
 - name: kogito-examples
   job_display_name: kogito-examples
-
 git:
   author:
     name: jstastny-cz
@@ -63,7 +62,7 @@ git:
   jenkins_config_path: .ci/jenkins
 buildchain_config:
   git:
-    repository: incubator-kie-kogito-pipelines
+    repository: kogito-pipelines
     file_path: .ci/pull-request-config.yaml
     token_credentials_id: kie-ci3-token
 maven:
