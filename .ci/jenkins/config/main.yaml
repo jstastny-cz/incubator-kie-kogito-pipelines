@@ -20,7 +20,7 @@ ecosystem:
     - incubator-kie-docs.*
 git:
   branches:
-  - name: 'kie-issues#650'
+  - name: 'kie-issues_650'
     main_branch: true
 seed:
   config_file:
@@ -29,7 +29,7 @@ seed:
       author:
         name: jstastny-cz
         credentials_id: ASF_Cloudbees_Jenkins_ci-builds
-      branch: 'kie-issues#650'
+      branch: 'kie-issues_650'
     path: .ci/jenkins/config/branch.yaml
   jenkinsfile: dsl/seed/jenkinsfiles/Jenkinsfile.seed.branch
 jenkins:
