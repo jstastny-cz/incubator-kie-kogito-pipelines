@@ -40,6 +40,8 @@ environments:
 disable:
   deploy: true 
 repositories:
+- name: kogito-pipelines
+  job_display_name: kogito-pipelines
 - name: kogito-apps
   job_display_name: kogito-apps
 - name: kogito-examples
