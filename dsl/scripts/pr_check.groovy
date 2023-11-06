@@ -123,6 +123,20 @@ boolean isEnableSonarCloudAnalysis() {
     return env.ENABLE_SONARCLOUD ? env.ENABLE_SONARCLOUD.toBoolean() : false
 }
 
+String getProjectFolder() {
+    def buildChainProject = env.BUILDCHAIN_PROJECT?.trim() ?: CHANGE_REPO
+    def project = (buildChainProject ? util.getProjectGroupName(buildChainProject) : util.getProjectTriggeringJob())[1]
+
+    // First guessing whether there is a clone defined into the buildchain config
+    // If not, fallback to simple folder structure
+    String projectFolder = "bc/apache_${project}/${project}"
+    if (!fileExists(projectFolder)) {
+        projectFolder = "bc/apache_${project}"
+    }
+
+    return projectFolder
+}
+
 String getReproducer(boolean isGH = false) {
     String reproducer = """
 ${env.QUARKUS_BRANCH ? "export QUARKUS_BRANCH=${env.QUARKUS_BRANCH}" : ''}
