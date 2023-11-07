@@ -90,9 +90,12 @@ void launchStages() {
                 configFileProvider([configFile(fileId: 'kie-pr-settings', variable: 'MAVEN_SETTINGS_FILE')]) {
                     withCredentials([string(credentialsId: 'SONARCLOUD_TOKEN', variable: 'TOKEN')]) {
                         new MavenCommand(this)
-                                .withProperty('sonar.login', "${TOKEN}")
+                                .withProperty('sonar.token', "${TOKEN}")
                                 .withProperty('sonar.organization', 'apache') // override what's in pom.xml for now
                                 .withProperty('sonar.projectKey', env.SONAR_PROJECT_KEY)
+                                .withProperty('sonar.pullrequest.key', env.CHANGE_ID)
+                                .withProperty('sonar.pullrequest.branch', env.CHANGE_BRANCH)
+                                .withProperty('sonar.pullrequest.base', env.CHANGE_TARGET)
                                 .withLogFileName('sonar_analysis.maven.log')
                                 .withSettingsXmlFile(MAVEN_SETTINGS_FILE)
                                 .run("-e -nsu validate -Psonarcloud-analysis -Denforcer.skip=true ${env.SONARCLOUD_ANALYSIS_MVN_OPTS ?: ''}")
