@@ -90,7 +90,7 @@ void launchStages() {
                 configFileProvider([configFile(fileId: 'kie-pr-settings', variable: 'MAVEN_SETTINGS_FILE')]) {
                     withCredentials([string(credentialsId: 'SONARCLOUD_TOKEN', variable: 'TOKEN')]) {
                         new MavenCommand(this)
-                                .withProperty('sonar.token', "${TOKEN}")
+                                .withProperty('sonar.login', "${TOKEN}")
                                 .withProperty('sonar.organization', 'apache') // override what's in pom.xml for now
                                 .withProperty('sonar.projectKey', env.SONAR_PROJECT_KEY)
                                 .withProperty('sonar.pullrequest.key', env.CHANGE_ID)
