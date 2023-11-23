@@ -53,6 +53,10 @@ String getSeedConfigFileGitAuthorCredsId() {
     return SEED_CONFIG_FILE_GIT_AUTHOR_CREDS_ID ?: DEFAULT_CREDENTIALS_ID
 }
 
+String getSeedConfigFileGitAuthorPushCredsId() {
+    return SEED_CONFIG_FILE_GIT_AUTHOR_PUSH_CREDS_ID ?: DEFAULT_CREDENTIALS_ID
+}
+
 String getSeedConfigFileGitBranch() {
     return SEED_CONFIG_FILE_GIT_BRANCH ?: 'main'
 }
@@ -110,6 +114,7 @@ pipelineJob('0-seed-job') {
         stringParam('SEED_CONFIG_FILE_GIT_REPOSITORY', getSeedConfigFileGitRepository(), 'Repository containing the seed main config file')
         stringParam('SEED_CONFIG_FILE_GIT_AUTHOR_NAME', getSeedConfigFileGitAuthorName(), 'Author name of repository containing the seed main config file')
         stringParam('SEED_CONFIG_FILE_GIT_AUTHOR_CREDS_ID', getSeedConfigFileGitAuthorCredsId(), 'Credentials Id for the author of repository containing the seed main config file')
+        stringParam('SEED_CONFIG_FILE_GIT_AUTHOR_PUSH_CREDS_ID', getSeedConfigFileGitAuthorPushCredsId(), 'Push enabled Credentials Id for the author of repository containing the seed main config file')
         stringParam('SEED_CONFIG_FILE_GIT_BRANCH', getSeedConfigFileGitBranch(), 'Branch of repository containing the seed main config file')
         stringParam('SEED_CONFIG_FILE_PATH', getSeedConfigFilePath(), 'Path on repository containing the seed main config file')
 
