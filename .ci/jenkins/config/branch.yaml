@@ -38,28 +38,28 @@ environments:
     ids:
     - ecosystem
 repositories:
-- name: incubator-kie-kogito-pipelines
+- name: kogito-pipelines
   job_display_name: kogito-pipelines
-- name: incubator-kie-kogito-runtimes
+- name: kogito-runtimes
   job_display_name: kogito-runtimes
-- name: incubator-kie-kogito-apps
+- name: kogito-apps
   job_display_name: kogito-apps
-- name: incubator-kie-kogito-examples
+- name: kogito-examples
   job_display_name: kogito-examples
-- name: incubator-kie-kogito-images
-  job_display_name: kogito-images
-- name: incubator-kie-kogito-operator
-  job_display_name: kogito-operator
-- name: incubator-kie-kogito-serverless-operator
-  job_display_name: kogito-serverless-operator
-- name: incubator-kie-kogito-docs
-  job_display_name: kogito-docs
-- name: incubator-kie-docs
-  job_display_name: kie-docs
-  branch: main-kogito
+# - name: incubator-kie-kogito-images
+#   job_display_name: kogito-images
+# - name: incubator-kie-kogito-operator
+#   job_display_name: kogito-operator
+# - name: incubator-kie-kogito-serverless-operator
+#   job_display_name: kogito-serverless-operator
+# - name: incubator-kie-kogito-docs
+#   job_display_name: kogito-docs
+# - name: incubator-kie-docs
+#   job_display_name: kie-docs
+#   branch: main-kogito
 git:
   author:
-    name: apache
+    name: jstastny-cz
     # Taken from https://ci-builds.apache.org/credentials/
     # Need to be verified
     credentials_id: 399061d0-5ab5-4142-a186-a52081fef742
@@ -80,7 +80,7 @@ git:
   jenkins_config_path: .ci/jenkins
 buildchain_config:
   git:
-    repository: incubator-kie-kogito-pipelines
+    repository: kogito-pipelines
     file_path: .ci/pull-request-config.yaml
     token_credentials_id: kie-ci3-token
 maven:
