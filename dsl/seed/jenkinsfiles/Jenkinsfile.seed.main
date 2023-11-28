@@ -54,7 +54,6 @@ pipeline {
                         SEED_CONFIG_FILE_GIT_REPOSITORY: "${SEED_CONFIG_FILE_GIT_REPOSITORY}",
                         SEED_CONFIG_FILE_GIT_AUTHOR_NAME: "${SEED_CONFIG_FILE_GIT_AUTHOR_NAME}",
                         SEED_CONFIG_FILE_GIT_AUTHOR_CREDS_ID: "${SEED_CONFIG_FILE_GIT_AUTHOR_CREDS_ID}",
-                        SEED_CONFIG_FILE_GIT_AUTHOR_PUSH_CREDS_ID: "${SEED_CONFIG_FILE_GIT_AUTHOR_PUSH_CREDS_ID}",
                         SEED_CONFIG_FILE_GIT_BRANCH: "${SEED_CONFIG_FILE_GIT_BRANCH}",
                         SEED_CONFIG_FILE_PATH: "${SEED_CONFIG_FILE_PATH}",
                         ALL_BRANCHES: readSeedConfig().git.branches.collect { it.name }.join(','),
