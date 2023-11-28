@@ -20,18 +20,18 @@ ecosystem:
     - incubator-kie-docs.*
 git:
   branches:
-  - name: main
+  - name: push-privilege
     main_branch: true
 seed:
   config_file:
     git:
-      repository: incubator-kie-kogito-pipelines
+      repository: kogito-pipelines
       author:
-        name: apache
+        name: jstastny-cz
         credentials_id: ASF_Cloudbees_Jenkins_ci-builds
         push:
           credentials_id: 84811880-2025-45b6-a44c-2f33bef30ad2 # CI Push Access for KIE
-      branch: main
+      branch: push-privilege
     path: .ci/jenkins/config/branch.yaml
   jenkinsfile: dsl/seed/jenkinsfiles/Jenkinsfile.seed.branch
 jenkins:
