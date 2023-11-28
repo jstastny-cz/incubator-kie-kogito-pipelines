@@ -99,6 +99,7 @@ pipeline {
                             SEED_CONFIG_FILE_GIT_REPOSITORY: branchConfigFileInfo.repository,
                             SEED_CONFIG_FILE_GIT_AUTHOR_NAME: branchConfigFileInfo.author,
                             SEED_CONFIG_FILE_GIT_AUTHOR_CREDS_ID: branchConfigFileInfo.credentials,
+                            SEED_CONFIG_FILE_GIT_AUTHOR_PUSH_CREDS_ID: branchConfigFileInfo.push_credentials,
                             SEED_CONFIG_FILE_GIT_BRANCH: branchConfigFileInfo.branch,
                             SEED_CONFIG_FILE_PATH: branchConfigFileInfo.filepath,
                         ]
@@ -227,6 +228,7 @@ def getBranchConfigFileInfo(branchInfo) {
         repository: branchInfo.seed?.config_file?.git?.repository ?: readSeedConfig().seed.config_file.git.repository,
         author: branchInfo.seed?.config_file?.git?.author?.name ?: readSeedConfig().seed.config_file.git.author.name,
         credentials: branchInfo.seed?.config_file?.git?.author?.credentials_id ?: readSeedConfig().seed.config_file.git.author.credentials_id,
+        push_credentials: branchInfo.seed?.config_file?.git?.author?.push?.credentials_id ?: readSeedConfig().seed.config_file.git.author.push.credentials_id,
         branch: branchInfo.seed?.config_file?.git?.branch ?: branchInfo.name,
         filepath: branchInfo.seed?.config_file?.path ?: readSeedConfig().seed.config_file.path,
         jenkinsfile: branchInfo.seed?.jenkinsfile ?: (readSeedConfig().seed.jenkinsfile ?: 'dsl/seed/jenkinsfiles/Jenkinsfile.seed.branch'),
