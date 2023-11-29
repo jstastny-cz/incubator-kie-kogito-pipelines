@@ -143,11 +143,11 @@ class Utils {
     }
 
     static String getGitAuthorPushCredsId(def script) {
-        return getRepositoryGitAuthorPushCredentialsId(script, getRepoName(script))
+        return getBindingValue(script, 'GIT_AUTHOR_PUSH_CREDENTIALS_ID')
     }
 
     static String getGitAuthorPushTokenCredsId(def script) {
-        return getRepositoryGitAuthorPushTokenCredentialsId(script, getRepoName(script))
+        return getBindingValue(script, 'GIT_AUTHOR_PUSH_TOKEN_CREDENTIALS_ID')
     }
 
     static String getGitForkAuthorName(def script) {
