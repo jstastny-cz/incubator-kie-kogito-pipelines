@@ -121,7 +121,7 @@ void setupUpdateJenkinsDependenciesJob() {
         BUILD_BRANCH_NAME: "${GIT_BRANCH}",
         GIT_AUTHOR: "${GIT_AUTHOR_NAME}",
         GIT_AUTHOR_CREDS_ID: "${GIT_AUTHOR_CREDENTIALS_ID}",
-        GIT_AUTHOR_PUSH_CREDS_ID: Utils.getGitAuthorPushCredentialsId(this),
+        GIT_AUTHOR_PUSH_CREDS_ID: Utils.getGitAuthorPushCredsId(this),
     ])
     KogitoJobTemplate.createPipelineJob(this, jobParams)
 }
