@@ -158,6 +158,10 @@ class Utils {
         return getBindingValue(script, 'GIT_FORK_AUTHOR_CREDENTIALS_ID')
     }
 
+    static String getGitForkAuthorPushCredsId(def script) {
+        return getBindingValue(script, 'GIT_FORK_AUTHOR_PUSH_CREDENTIALS_ID')
+    }
+
     static String getGitQuarkusBranch(def script) {
         return getBindingValue(script, 'GIT_QUARKUS_BRANCH')
     }

@@ -171,7 +171,7 @@ class KogitoJobUtils {
             PROJECT_NAME: project,
 
             GIT_FORK_AUTHOR: Utils.getGitForkAuthorName(script),
-            GIT_FORK_AUTHOR_CREDS_ID: Utils.getGitForkAuthorCredsId(script),
+        GIT_FORK_AUTHOR_CREDS_ID: Utils.getGitForkAuthorCredsId(script),
             GIT_FORK_AUTHOR_PUSH_CREDS_ID: Utils.getGitForkAuthorPushCredsId(script),
         ])
         def job = KogitoJobTemplate.createPipelineJob(script, jobParams)
